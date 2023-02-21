@@ -1,5 +1,6 @@
 package com.adaequare.bankapps.dtos;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AccountDetails {
@@ -57,6 +58,9 @@ public class AccountDetails {
     }
 
     public List<TransactionDetails> getTransactionDetailsList() {
+        if (null == transactionDetailsList) {
+            return new ArrayList<>();
+        }
         return transactionDetailsList;
     }
 
@@ -72,7 +76,7 @@ public class AccountDetails {
                 ", lastName='" + lastName + '\'' +
                 ", address=" + address +
                 ", bankBalance=" + bankBalance +
-                ", transactionDetailsList=" + transactionDetailsList +
+                ", transactionDetailsList=" + getTransactionDetailsList() +
                 '}';
     }
 }

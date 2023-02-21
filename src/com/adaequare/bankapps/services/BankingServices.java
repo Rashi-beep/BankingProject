@@ -8,7 +8,7 @@ public interface BankingServices {
 
     float depositAmount(long acctNumber, float deposit);
 
-    float withdrawAmount(float withdraw);
+    float withdrawAmount(long acctNumber, float withdraw) throws Exception;
 
     String transferAmount(float amount, Object accountDetails);
 }

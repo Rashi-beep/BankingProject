@@ -64,9 +64,17 @@ public class Execute {
                 System.out.println("Account Number : " + accountNumber + " Account details :" + accDetails );
             }
 
+            hdfcService.depositAmount(accountDetails.getAccountNumber(), 10000);
+
+            //AccountDetails accDtls1 = dataStore.get(accountDetails.getAccountNumber());
+
+            System.out.println("Updated balance details " + accountDetails);
+
 
 
         }
+
+
 
 
 
