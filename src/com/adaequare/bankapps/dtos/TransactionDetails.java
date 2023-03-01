@@ -20,7 +20,6 @@ public class TransactionDetails {
     public void setTransactionId(long transactionId) {
         this.transactionId = transactionId;
     }
-
     public Date getTransactionTime() {
         return transactionTime;
     }
@@ -28,7 +27,6 @@ public class TransactionDetails {
     public void setTransactionTime(Date transactionTime) {
         this.transactionTime = transactionTime;
     }
-
     public float getAmount() {
         return amount;
     }

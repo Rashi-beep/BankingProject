@@ -59,7 +59,7 @@ public class AccountDetails {
 
     public List<TransactionDetails> getTransactionDetailsList() {
         if (null == transactionDetailsList) {
-            return new ArrayList<>();
+            transactionDetailsList = new ArrayList<>();
         }
         return transactionDetailsList;
     }

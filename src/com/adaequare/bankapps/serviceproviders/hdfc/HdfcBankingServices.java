@@ -12,7 +12,7 @@ public class HdfcBankingServices implements BankingServices {
 
     private Map<Long, AccountDetails> accountDataStore = new HashMap();
 
-
+    private float amount;
     @Override
     public AccountDetails openAccountWithDetails(AccountOpeningDetails accountOpeningDetails) throws Exception {
 
@@ -61,7 +61,11 @@ public class HdfcBankingServices implements BankingServices {
 
 
     @Override
-    public float depositAmount(long accountNumber, float deposit) {
+    public float depositAmount(long accountNumber, float deposit, TransactionType transactionType) {
+
+        if(transactionType == TransactionType.DEBIT){
+            throw new RuntimeException("Invalid transaction");
+        }
         AccountDetails accountDetails = accountDataStore.get(accountNumber);
         float bankBalance = accountDetails.getBankBalance();
         accountDetails.setBankBalance(bankBalance + deposit);
@@ -69,9 +73,9 @@ public class HdfcBankingServices implements BankingServices {
 
         TransactionDetails transactionDetails = new TransactionDetails();
         transactionDetails.setAmount(deposit);
-        transactionDetails.setTransactionTime(new Date());
+        //transactionDetails.setTransactionTime(new Date());
         transactionDetails.setTransactionId(new Random().nextLong());
-        transactionDetails.setTransactionType(TransactionType.CREDIT);
+        transactionDetails.setTransactionType(transactionType);
 
         List<TransactionDetails> transactionDetailsList = accountDetails.getTransactionDetailsList();
         transactionDetailsList.add(transactionDetails);
@@ -84,15 +88,19 @@ public class HdfcBankingServices implements BankingServices {
     }
 
     @Override
-    public float withdrawAmount(long acctNumber, float withdraw) throws Exception{
+    public float withdrawAmount(long acctNumber, float withdraw, TransactionType transactionType ) {
 
+
+        if(transactionType == TransactionType.CREDIT){
+            throw new RuntimeException("Invalid transaction");
+        }
         AccountDetails accountDetails = accountDataStore.get(acctNumber);
 
 
         float bankBalance = accountDetails.getBankBalance();
 
-        if(withdraw > bankBalance){
-              throw new Exception("In Sufficient balance");
+        if (withdraw > bankBalance) {
+            throw new RuntimeException("In Sufficient balance");
         }
 
         accountDetails.setBankBalance(bankBalance - withdraw);
@@ -102,7 +110,7 @@ public class HdfcBankingServices implements BankingServices {
         transactionDetails.setAmount(withdraw);
         transactionDetails.setTransactionTime(new Date());
         transactionDetails.setTransactionId(new Random().nextLong());
-        transactionDetails.setTransactionType(TransactionType.DEBIT);
+        transactionDetails.setTransactionType(transactionType);
 
         accountDetails.getTransactionDetailsList().add(transactionDetails);
 
@@ -110,12 +118,31 @@ public class HdfcBankingServices implements BankingServices {
     }
 
     @Override
-    public String transferAmount(float amount, Object accountDetails) {
-        return null;
+    public String transferAmount(float amount, long fromAccNumber, long toAccNumber) {
+
+        AccountDetails fromAccountDetails = this.accountDataStore.get(fromAccNumber);
+
+        AccountDetails toAccountDetails = this.accountDataStore.get(toAccNumber);
+
+        if (null == fromAccountDetails) {
+            throw new RuntimeException("Invalid from account details");
+        }
+
+        if (null == toAccountDetails) {
+            throw new RuntimeException("Invalid to account details");
+        }
+
+        try {
+            this.withdrawAmount(fromAccNumber, amount, TransactionType.TRANSFER);
+            this.depositAmount(toAccNumber, amount, TransactionType.CREDIT);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("Exception raised we need to roll back our transaction");
+        }
+        return "Amount transferred successfully";
     }
 
-
-    public Map<Long, AccountDetails> getDataStore(){
+    public Map<Long, AccountDetails> getDataStore() {
         return accountDataStore;
     }
 }
