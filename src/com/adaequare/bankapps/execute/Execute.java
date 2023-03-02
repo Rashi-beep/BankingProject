@@ -8,73 +8,63 @@ import com.adaequare.bankapps.dtos.TransactionDetails;
 import com.adaequare.bankapps.enums.TransactionType;
 import com.adaequare.bankapps.serviceproviders.hdfc.HdfcBankingServices;
 import com.adaequare.bankapps.services.BankingServices;
+import com.adaequare.bankapps.services.BankingServicesFactory;
 
 import java.util.*;
 
 public class Execute {
 
-    public static <TransactionDetails> void main(String[] args) throws Exception {
-        BankingServices bankingServices = new HdfcBankingServices();
 
-        AccountOpeningDetails accountOpeningDetails = new AccountOpeningDetails();
-
-        accountOpeningDetails.setFirstName("Kishore");
-        accountOpeningDetails.setLastName("Oggu");
-
-        accountOpeningDetails.setAge(20);
-
-
-        Address address = new Address();
-        address.setCity("HYd");
-        address.setPin(500049);
-
-        accountOpeningDetails.setAddress(address);
-
-
-        AccountDetails accountDetails = bankingServices.openAccountWithDetails(accountOpeningDetails);
-        System.out.println("1 : Account id is : " + accountDetails.getAccountNumber());
-
-        AccountOpeningDetails accountOpeningDetails2 = new AccountOpeningDetails();
-        accountOpeningDetails2.setFirstName("Praveen");
-        accountOpeningDetails2.setLastName("Surname");
-        accountOpeningDetails2.setAge(19);
-
-        Address address2 = new Address();
-        address2.setCity("HYd");
-        address2.setPin(500049);
-
-        accountOpeningDetails2.setAddress(address2);
-
-        AccountDetails accountDetails2 = bankingServices.openAccountWithDetails(accountOpeningDetails2);
-        System.out.println("2 : Account id is : " + accountDetails2.getAccountNumber());
-
-
-
+    public static void main(String[] args) throws Exception {
+        BankingServicesFactory bankingServicesFactory = new BankingServicesFactory();
+        BankingServices bankingServices = bankingServicesFactory.createBankingService("DSFJSKAFJ");
         if (bankingServices instanceof HdfcBankingServices) {
             HdfcBankingServices hdfcService = (HdfcBankingServices) bankingServices;
 
-            Map<Long, AccountDetails> dataStore = hdfcService.getDataStore();
+            hdfcService.hdfcAdditionalService();
 
 
-            Set<Long> accountNumbers = dataStore.keySet();
+            AccountOpeningDetails accountOpeningDetails = new AccountOpeningDetails();
 
-            Iterator<Long> iterator = accountNumbers.iterator();
+            accountOpeningDetails.setFirstName("Kishore");
+            accountOpeningDetails.setLastName("Oggu");
 
-            while (iterator.hasNext()) {
-                Long accountNumber = iterator.next();
-                AccountDetails accDetails = dataStore.get(accountNumber);
-                System.out.println("Account Number : " + accountNumber + " Account details :" + accDetails);
-            }
+            accountOpeningDetails.setAge(20);
+
+
+            Address address = new Address();
+            address.setCity("HYd");
+            address.setPin(500049);
+
+            accountOpeningDetails.setAddress(address);
+
+
+            AccountDetails accountDetails = bankingServices.openAccountWithDetails(accountOpeningDetails);
+            System.out.println("1 : Account id is : " + accountDetails.getAccountNumber());
+
+            AccountOpeningDetails accountOpeningDetails2 = new AccountOpeningDetails();
+            accountOpeningDetails2.setFirstName("Praveen");
+            accountOpeningDetails2.setLastName("Surname");
+            accountOpeningDetails2.setAge(19);
+
+            Address address2 = new Address();
+            address2.setCity("HYd");
+            address2.setPin(500049);
+
+            accountOpeningDetails2.setAddress(address2);
+
+            AccountDetails accountDetails2 = bankingServices.openAccountWithDetails(accountOpeningDetails2);
+            System.out.println("2 : Account id is : " + accountDetails2.getAccountNumber());
+
+
+
 
             hdfcService.depositAmount(accountDetails.getAccountNumber(), 10000, TransactionType.CREDIT);
-            hdfcService.transferAmount(accountDetails.getAccountNumber(), accountDetails2.getAccountNumber(), 2000);
 
-            //AccountDetails accDtls1 = dataStore.get(accountDetails.getAccountNumber());
-
+            System.out.println("After deposit " + accountDetails);
+            hdfcService.transferAmount(2000, accountDetails.getAccountNumber(), accountDetails2.getAccountNumber());
             System.out.println("Updated balance details " + accountDetails);
         }
-
-
     }
 
 }

@@ -42,4 +42,15 @@ public class TransactionDetails {
     public void setTransactionType(TransactionType transactionType) {
         this.transactionType = transactionType;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append("Transaction details are ");
+        result.append("transactionType ");
+        result.append(this.getTransactionType());
+        result.append(" Amount ");
+        result.append(this.getAmount());
+        return result.toString();
+    }
 }
