@@ -5,6 +5,7 @@ import com.adaequare.bankapps.dtos.AccountDetails;
 import com.adaequare.bankapps.dtos.AccountOpeningDetails;
 import com.adaequare.bankapps.dtos.Address;
 import com.adaequare.bankapps.dtos.TransactionDetails;
+import com.adaequare.bankapps.enums.BankName;
 import com.adaequare.bankapps.enums.TransactionType;
 import com.adaequare.bankapps.serviceproviders.hdfc.HdfcBankingServices;
 import com.adaequare.bankapps.services.BankingServices;
@@ -17,28 +18,21 @@ public class Execute {
 
     public static void main(String[] args) throws Exception {
         BankingServicesFactory bankingServicesFactory = new BankingServicesFactory();
-        BankingServices bankingServices = bankingServicesFactory.createBankingService("DSFJSKAFJ");
+        BankingServices bankingServices = bankingServicesFactory.createBankingService(BankName.HDFC);
         if (bankingServices instanceof HdfcBankingServices) {
             HdfcBankingServices hdfcService = (HdfcBankingServices) bankingServices;
-
             hdfcService.hdfcAdditionalService();
-
-
             AccountOpeningDetails accountOpeningDetails = new AccountOpeningDetails();
 
             accountOpeningDetails.setFirstName("Kishore");
             accountOpeningDetails.setLastName("Oggu");
-
             accountOpeningDetails.setAge(20);
-
 
             Address address = new Address();
             address.setCity("HYd");
             address.setPin(500049);
 
             accountOpeningDetails.setAddress(address);
-
-
             AccountDetails accountDetails = bankingServices.openAccountWithDetails(accountOpeningDetails);
             System.out.println("1 : Account id is : " + accountDetails.getAccountNumber());
 
@@ -62,8 +56,9 @@ public class Execute {
             hdfcService.depositAmount(accountDetails.getAccountNumber(), 10000, TransactionType.CREDIT);
 
             System.out.println("After deposit " + accountDetails);
-            hdfcService.transferAmount(2000, accountDetails.getAccountNumber(), accountDetails2.getAccountNumber());
+            hdfcService.transferAmount(2000, accountDetails.getAccountNumber(), 1234567);
             System.out.println("Updated balance details " + accountDetails);
+            System.out.println("Third party account balance " + accountDetails2);
         }
     }
 

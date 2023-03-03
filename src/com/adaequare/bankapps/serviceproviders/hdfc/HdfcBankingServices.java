@@ -4,6 +4,8 @@ import com.adaequare.bankapps.dtos.AccountDetails;
 import com.adaequare.bankapps.dtos.AccountOpeningDetails;
 import com.adaequare.bankapps.dtos.TransactionDetails;
 import com.adaequare.bankapps.enums.TransactionType;
+import com.adaequare.bankapps.exceptions.FromAccountDetailsNotFoundException;
+import com.adaequare.bankapps.exceptions.ToAccountDetailsNotFoundException;
 import com.adaequare.bankapps.services.BankingServices;
 
 import java.util.*;
@@ -68,6 +70,12 @@ public class HdfcBankingServices implements BankingServices {
     @Override
     public float depositAmount(long accountNumber, float deposit, TransactionType transactionType) {
 
+        AccountDetails toAccountDetails = this.accountDataStore.get(accountNumber);
+
+        if (null == toAccountDetails) {
+            throw new ToAccountDetailsNotFoundException("Invalid to account details");
+        }
+
         if(transactionType == TransactionType.DEBIT){
             throw new RuntimeException("Invalid transaction");
         }
@@ -89,15 +97,21 @@ public class HdfcBankingServices implements BankingServices {
         //accountDetails.getTransactionDetailsList().add(transactionDetails);
 
 
-        return accountDetails.getBankBalance();
+       return accountDetails.getBankBalance();
     }
 
     @Override
     public float withdrawAmount(long acctNumber, float withdraw, TransactionType transactionType ) {
 
+        AccountDetails fromAccountDetails = this.accountDataStore.get(acctNumber);
+
+        if (null == fromAccountDetails) {
+            throw new FromAccountDetailsNotFoundException("Invalid from account details");
+        }
+
 
         if(transactionType == TransactionType.CREDIT){
-            throw new RuntimeException("Invalid transaction");
+            throw new RuntimeException("Invalid transaction type");
         }
         AccountDetails accountDetails = accountDataStore.get(acctNumber);
 
@@ -124,27 +138,21 @@ public class HdfcBankingServices implements BankingServices {
 
     @Override
     public String transferAmount(float amount, long fromAccNumber, long toAccNumber) {
-
-        AccountDetails fromAccountDetails = this.accountDataStore.get(fromAccNumber);
-
-        AccountDetails toAccountDetails = this.accountDataStore.get(toAccNumber);
-
-        if (null == fromAccountDetails) {
-            throw new RuntimeException("Invalid from account details");
-        }
-
-        if (null == toAccountDetails) {
-            throw new RuntimeException("Invalid to account details");
-        }
-
+        String result="Amount transferred successfully";
         try {
             this.withdrawAmount(fromAccNumber, amount, TransactionType.TRANSFER);
             this.depositAmount(toAccNumber, amount, TransactionType.CREDIT);
+        }catch (ToAccountDetailsNotFoundException e){
+            result="Invalid to account details provided so transaction failed";
+            this.depositAmount(fromAccNumber, amount, TransactionType.REVERT);
+        }catch (FromAccountDetailsNotFoundException e){
+            result="Invalid from account details provided so transaction failed";
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("Exception raised we need to roll back our transaction");
+            result = "Amount transferred failed";
         }
-        return "Amount transferred successfully";
+        return result;
     }
 
     public Map<Long, AccountDetails> getDataStore() {

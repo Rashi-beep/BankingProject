@@ -1,5 +1,6 @@
 package com.adaequare.bankapps.services;
 
+import com.adaequare.bankapps.enums.BankName;
 import com.adaequare.bankapps.serviceproviders.hdfc.AxisBankingServices;
 import com.adaequare.bankapps.serviceproviders.hdfc.HdfcBankingServices;
 
@@ -10,12 +11,23 @@ public class BankingServicesFactory {
         return bankingServices;
     }
 
-    public BankingServices createBankingService(String bankingServiceImplType){
+    public BankingServices createBankingService(BankName bankingServiceImplType){
         BankingServices bankingServices = null;
-        if(bankingServiceImplType.equals("HDFC")){
+        if(bankingServiceImplType == BankName.HDFC){
             bankingServices = new HdfcBankingServices();
-        }else if(bankingServiceImplType.equals("AXIS")){
+        }else if(bankingServiceImplType == BankName.AXIS){
             bankingServices = new AxisBankingServices();
+        }
+
+
+        switch (bankingServiceImplType){
+            case AXIS:
+                bankingServices = new AxisBankingServices();
+                break;
+            case HDFC:
+                bankingServices = new HdfcBankingServices();
+                break;
+            case ICICI: break;
         }
         return bankingServices;
     }
